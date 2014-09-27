@@ -1,5 +1,7 @@
 package com.example.cody;
 
+import com.example.cody.R;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
