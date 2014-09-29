@@ -2,30 +2,29 @@ package com.example.cody.algorithm;
 
 public class FFT {
 
+    /**Compute the FFT of x[], assuming its length is a power of 2
+     * @param x		array of Complex values ​​of a discrete function
+     * @return		converted array
+     */
     public static Complex[] fft(Complex[] x) {
         int N = x.length;
-
-        // base case
+        
         if (N == 1) return new Complex[] { x[0] };
 
-        // radix 2 Cooley-Tukey FFT
         if (N % 2 != 0) { throw new RuntimeException("N is not a power of 2"); }
 
-        // fft of even terms
         Complex[] even = new Complex[N/2];
         for (int k = 0; k < N/2; k++) {
             even[k] = x[2*k];
         }
         Complex[] q = fft(even);
 
-        // fft of odd terms
-        Complex[] odd  = even;  // reuse the array
+        Complex[] odd  = even;
         for (int k = 0; k < N/2; k++) {
             odd[k] = x[2*k + 1];
         }
         Complex[] r = fft(odd);
 
-        // combine
         Complex[] y = new Complex[N];
         for (int k = 0; k < N/2; k++) {
             double kth = -2 * k * Math.PI / N;
@@ -37,25 +36,24 @@ public class FFT {
     }
 
 
-    // compute the inverse FFT of x[], assuming its length is a power of 2
+    /**Compute the inverse FFT of x[], assuming its length is a power of 2
+     * @param x		array of Complex values ​​of a discrete function
+     * @return		converted array
+     */
     public static Complex[] ifft(Complex[] x) {
         int N = x.length;
         Complex[] y = new Complex[N];
 
-        // take conjugate
         for (int i = 0; i < N; i++) {
             y[i] = x[i].conjugate();
         }
 
-        // compute forward FFT
         y = fft(y);
 
-        // take conjugate again
         for (int i = 0; i < N; i++) {
             y[i] = y[i].conjugate();
         }
 
-        // divide by N
         for (int i = 0; i < N; i++) {
             y[i] = y[i].times(1.0 / N);
         }
@@ -64,7 +62,11 @@ public class FFT {
 
     }
 
-    // compute the circular convolution of x and y
+    /**Compute the circular convolution of x and y
+     * @param x		array of complex values ​​of a discrete function
+     * @param y		array of complex values ​​of a discrete function
+     * @return		result of the convolution
+     */
     public static Complex[] cconvolve(Complex[] x, Complex[] y) {
 
         // should probably pad x and y with 0s so that they have same length
@@ -88,7 +90,11 @@ public class FFT {
     }
 
 
-    // compute the linear convolution of x and y
+    /**Compute the linear convolution of x and y
+     * @param x		array of complex values ​​of a discrete function
+     * @param y		array of complex values ​​of a discrete function
+     * @return		result of the convolution
+     */
     public static Complex[] convolve(Complex[] x, Complex[] y) {
         Complex ZERO = new Complex(0, 0);
 
@@ -103,7 +109,10 @@ public class FFT {
         return cconvolve(a, b);
     }
 
-    // display an array of Complex numbers to standard output
+    /**Display an array of Complex numbers to standard output
+     * @param x			array of Complex numbers
+     * @param title
+     */
     public static void show(Complex[] x, String title) {
         System.out.println(title);
         System.out.println("-------------------");

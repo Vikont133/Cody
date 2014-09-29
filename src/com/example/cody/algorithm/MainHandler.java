@@ -1,14 +1,9 @@
 package com.example.cody.algorithm;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.example.cody.VoiceHandler;
 
-/**
- * @author vikont
- *
- */
 public class MainHandler implements VoiceHandler{
 
 	public static final int FRAME_LENGTH = 2048;

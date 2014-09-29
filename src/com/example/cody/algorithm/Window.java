@@ -1,7 +1,14 @@
 package com.example.cody.algorithm;
 
+/**Class that describes various types of windows
+ * @author vikont
+ */
 public class Window {
 
+	/**Hamming window
+	 * @param x		array to convert
+	 * @return		converted array
+	 */
 	public static double[] hamming(double[] x) {
 		int l = x.length;
 		for (int i = 0; i < l; i++){
@@ -10,6 +17,10 @@ public class Window {
 		return x;
 	}
 	
+	/**Hann window
+	 * @param x		array to convert
+	 * @return		converted array
+	 */
 	public static double[] hann(double[] x){
 		int l = x.length;
 		for (int i = 0; i < l; i++){
