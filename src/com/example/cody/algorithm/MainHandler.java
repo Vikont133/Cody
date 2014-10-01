@@ -45,27 +45,20 @@ public class MainHandler implements VoiceHandler{
 	}
 
 	private static double[][] divToFrames(double[] buffer) {
-		double[] newBuffer = expandBuffer(buffer);
-		int N = newBuffer.length / FRAME_LENGTH;
+		if (buffer.length < FRAME_LENGTH) {
+			throw new ArithmeticException("too short signal");
+		}
+		int N = 2 * buffer.length / FRAME_LENGTH - 1;
 		double[][] frames = new double[N][];
 		for (int i = 0; i < N; i++){
-			frames[i] = Arrays.copyOfRange(newBuffer, i * FRAME_LENGTH, (i + 1) * FRAME_LENGTH);
+			frames[i] = Arrays.copyOfRange(buffer, i * (FRAME_LENGTH / 2), (i + 2) * (FRAME_LENGTH / 2));
 		}
 		return frames;
 	}
 	
-	private static double[] expandBuffer(double[] buffer){
-		if (buffer.length % FRAME_LENGTH == 0){
-			return buffer;
-		}
-		int newLength = (buffer.length / FRAME_LENGTH + 1) * FRAME_LENGTH;
-		double[] newBuffer = new double[newLength];
-		System.arraycopy(buffer, 0, newBuffer, 0, buffer.length);
-		return newBuffer;
-	}
 	
 	public static void main(String[] args) {
-		short [] buffer = {1, 2, 3, 4, 5, 6, 7, 8};
+		short [] buffer = {1,2,3,4,5,6,7,8,9,10};
 		double [][] audioFrames = divToFrames(normalize(buffer));
 		for (int i = 0; i < audioFrames.length; i++) {
 			for (int j = 0; j < audioFrames[i].length; j++) {
