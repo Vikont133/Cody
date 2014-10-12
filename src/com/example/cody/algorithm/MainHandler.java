@@ -7,6 +7,7 @@ import com.example.cody.VoiceHandler;
 public class MainHandler implements VoiceHandler{
 
 	public static final int FRAME_LENGTH = 2048;
+    public static final int SAMPLING_FREQ = 16000;
 	
 	@Override
 	public void addUser(String name, short[] audioBuffer) {
@@ -60,11 +61,18 @@ public class MainHandler implements VoiceHandler{
 	public static void main(String[] args) {
 		short [] buffer = {1,2,3,4,5,6,7,8,9,10};
 		double [][] audioFrames = divToFrames(normalize(buffer));
-		for (int i = 0; i < audioFrames.length; i++) {
-			for (int j = 0; j < audioFrames[i].length; j++) {
-				System.out.print(audioFrames[i][j] + " ");
-			}
-			System.out.println();
-		}
+
+//		for (int i = 0; i < audioFrames.length; i++) {
+//			for (int j = 0; j < audioFrames[i].length; j++) {
+//				System.out.print(audioFrames[i][j] + " ");
+//			}
+//			System.out.println();
+//		}
+
+        //TODO add preprocessing
+
+        for (int i = 0; i < audioFrames.length; i++){
+            double[] melCoeff = Mel.getMelKrepsCoef(audioFrames[i]);
+        }
 	}	
 }
