@@ -1,4 +1,6 @@
-package com.example.cody.algorithm;
+package com.example.cody.algorithm.processing;
+
+import com.example.cody.algorithm.Complex;
 
 public class FFT {
 

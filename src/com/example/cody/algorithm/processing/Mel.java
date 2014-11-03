@@ -1,4 +1,7 @@
-package com.example.cody.algorithm;
+package com.example.cody.algorithm.processing;
+
+import com.example.cody.algorithm.Complex;
+import com.example.cody.algorithm.MainHandler;
 
 public class Mel {
 	
@@ -21,7 +24,18 @@ public class Mel {
 	public static double melToHz(double f) {
 		return 700 * (Math.exp(f / 1125) - 1);
 	}
-	
+
+    public static double[] getMelKrepsCoef(double[][] x){
+        double[] result = new double[NUMBER_OF_FILTERS];
+        for (double[] arr : x){
+            double[] tmp = getMelKrepsCoef(arr);
+            for (int i = 0; i < tmp.length; i++) {
+                result[i] += tmp[i] / NUMBER_OF_FILTERS;
+            }
+        }
+        return result;
+    }
+
 	public static double[] getMelKrepsCoef(double[] x) {
 		Complex[] spectrum = FFT.fft(doubleToComplex(Window.hamming(x)));
         double[] powerSpectrum = spectrumPower(spectrum);

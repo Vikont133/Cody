@@ -1,4 +1,4 @@
-package com.example.cody.algorithm;
+package com.example.cody.algorithm.processing;
 
 /**Class that describes various types of windows
  * @author vikont

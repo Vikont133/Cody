@@ -1,8 +1,11 @@
 package com.example.cody.algorithm;
 
-import java.util.Arrays;
 
 import com.example.cody.VoiceHandler;
+import com.example.cody.algorithm.preprocessing.Preprocessing;
+import com.example.cody.algorithm.processing.Mel;
+
+import java.util.Arrays;
 
 public class MainHandler implements VoiceHandler{
 
@@ -11,7 +14,7 @@ public class MainHandler implements VoiceHandler{
 	
 	@Override
 	public void addUser(String name, short[] audioBuffer) {
-		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -60,19 +63,13 @@ public class MainHandler implements VoiceHandler{
 	
 	public static void main(String[] args) {
 		short [] buffer = {1,2,3,4,5,6,7,8,9,10};
-		double [][] audioFrames = divToFrames(normalize(buffer));
 
-//		for (int i = 0; i < audioFrames.length; i++) {
-//			for (int j = 0; j < audioFrames[i].length; j++) {
-//				System.out.print(audioFrames[i][j] + " ");
-//			}
-//			System.out.println();
-//		}
+//        buffer = Preprocessing.handle(buffer);
 
         //TODO add preprocessing
 
-        for (int i = 0; i < audioFrames.length; i++){
-            double[] melCoeff = Mel.getMelKrepsCoef(audioFrames[i]);
-        }
-	}	
+		double [][] audioFrames = divToFrames(normalize(buffer));
+        double result [] = Mel.getMelKrepsCoef(audioFrames);
+        System.out.println(result);
+    }
 }
