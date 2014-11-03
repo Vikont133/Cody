@@ -7,14 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import android.app.Activity;
 import android.media.AudioFormat;
-import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.os.Bundle;
 import android.os.Environment;
-import android.view.View;
-import android.widget.Button;
 
 public class RecordAudioToShortArray {
 	private static final int RECORDER_BPP = 16;
@@ -27,7 +22,12 @@ public class RecordAudioToShortArray {
 	private int bufferSize = 0;
 	private Thread recordingThread = null;
 	private boolean isRecording = false;
+	short[] arrayShort = null;
 		
+	public short[] getArrayShort() {
+		return arrayShort;
+	}
+
 	public RecordAudioToShortArray() {
 		this.bufferSize = AudioRecord.getMinBufferSize(16000,
 				AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);;
@@ -93,7 +93,6 @@ public class RecordAudioToShortArray {
 		try {
 			os = new FileOutputStream(filename);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -119,7 +118,7 @@ public class RecordAudioToShortArray {
 		}
 	}
 
-	void stopRecording() {
+	void stopRecording() throws IOException {
 		if (null != recorder) {
 			isRecording = false;
 
@@ -134,6 +133,7 @@ public class RecordAudioToShortArray {
 
 		copyWaveFile(getTempFilename(), getFilename());
 		deleteTempFile();
+		arrayShort = makeShortFromByte();
 	}
 
 	private void deleteTempFile() {
@@ -197,12 +197,13 @@ public class RecordAudioToShortArray {
 		return rightbytes;
 	}
 	
-	short[] makeShortFromByte(byte[] array){
-		short[] arrayShort = new short[array.length/2];
+	short[] makeShortFromByte() throws IOException{
+		byte[] array = readBytesFromFile();
+		short[] arrShort = new short[array.length/2];
 		for (int i = 0 ; i < array.length/2; i++){
-			arrayShort[i] = (short) ((array[2*i +1] << 8) | (array[2*i]));
+			arrShort[i] = (short) ((array[2*i +1] << 8) | (array[2*i]));
 		}
-		return arrayShort;
+		return arrShort;
 	}
 
 	private void WriteWaveFileHeader(FileOutputStream out, long totalAudioLen,

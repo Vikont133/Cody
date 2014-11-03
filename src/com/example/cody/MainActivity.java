@@ -1,17 +1,9 @@
 package com.example.cody;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+
 import android.app.Activity;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 
@@ -59,8 +51,11 @@ public class MainActivity extends Activity {
 				AppLog.logString("Start Recording");
 
 				enableButtons(false);
-				record.stopRecording();
-
+				try {
+					record.stopRecording();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				break;
 			}
 
