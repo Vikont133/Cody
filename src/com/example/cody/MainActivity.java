@@ -1,112 +1,65 @@
 package com.example.cody;
 
+import java.io.IOException;
+
 import android.app.Activity;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 
 public class MainActivity extends Activity {
-    private static final int RECORDER_SAMPLERATE = 16000;
-    private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
-    private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
+	private RecordAudioToShortArray record = null;
 
-    private AudioRecord recorder = null;
-    private int bufferSize = 2048;
-    private Thread recordingThread = null;
-    private boolean isRecording = false;
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);;
+		setButtonHandlers();
+		enableButtons(false);
+		
+		record = new RecordAudioToShortArray();
+	}
 
-        AppLog.logString("start message");
+	private void setButtonHandlers() {
+		((Button) findViewById(R.id.recordbutton)).setOnClickListener(btnClick);
+		((Button) findViewById(R.id.stopbutton)).setOnClickListener(btnClick);
+	}
 
-        setButtonHandlers();
-        enableButtons(false);
-    }
+	private void enableButton(int id, boolean isEnable) {
+		((Button) findViewById(id)).setEnabled(isEnable);
+	}
 
-    private void setButtonHandlers() {
-        findViewById(R.id.recordbutton).setOnClickListener(btnClick);
-        findViewById(R.id.stopbutton).setOnClickListener(btnClick);
-    }
+	private void enableButtons(boolean isRecording) {
+		enableButton(R.id.recordbutton, !isRecording);
+		enableButton(R.id.stopbutton, isRecording);
+	}
 
-    private void enableButton(int id,boolean isEnable){
-        findViewById(id).setEnabled(isEnable);
-    }
+	private View.OnClickListener btnClick = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			switch (v.getId()) {
+			case R.id.recordbutton: {
+				AppLog.logString("Start Recording");
 
-    private void enableButtons(boolean isRecording) {
-        enableButton(R.id.recordbutton,!isRecording);
-        enableButton(R.id.stopbutton,isRecording);
-    }
+				enableButtons(true);
+				record.startRecording();
 
-    private void startRecording(){
-        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, bufferSize);
+				break;
+			}
+			case R.id.stopbutton: {
+				AppLog.logString("Start Recording");
 
-        int i = recorder.getState();
-        if(i==1)
-            recorder.startRecording();
+				enableButtons(false);
+				try {
+					record.stopRecording();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				break;
+			}
 
-        isRecording = true;
-
-        recordingThread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                readBuffer();
-            }
-        },"AudioRecorder Thread");
-
-        recordingThread.start();
-    }
-
-    private void readBuffer(){
-        short data[] = new short[bufferSize];
-
-        while(isRecording){
-            System.out.println(recorder.read(data, 0, bufferSize));
-        }
-    }
-
-    private void stopRecording(){
-        if(null != recorder){
-            isRecording = false;
-
-            int i = recorder.getState();
-            if(i==1) {
-                recorder.stop();
-            }
-            recorder.release();
-
-            recorder = null;
-            recordingThread = null;
-        }
-    }
-
-    private View.OnClickListener btnClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch(v.getId()){
-                case R.id.recordbutton:{
-                    AppLog.logString("Start Recording");
-
-                    enableButtons(true);
-                    startRecording();
-
-                    break;
-                }
-                case R.id.stopbutton:{
-                    AppLog.logString("Stop Recording");
-
-                    enableButtons(false);
-                    stopRecording();
-
-                    break;
-                }
-            }
-        }
-    };
+			}
+		}
+	};
 }
