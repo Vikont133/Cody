@@ -28,6 +28,13 @@ public class MainHandler implements VoiceHandler{
 		// TODO Auto-generated method stub
 		
 	}
+
+    public static double[] getMelKreps(short[] audioBuffer){
+        double [] tmp = Preprocessing.handle(normalize(audioBuffer));
+
+        double [][] audioFrames = divToFrames(tmp);
+        return Mel.getMelKrepsCoef(audioFrames);
+    }
 	
 	private static double[] normalize(short[] audioBuffer) {
 		short max = findMax(audioBuffer);
@@ -39,9 +46,9 @@ public class MainHandler implements VoiceHandler{
 	}
 	
 	private static short findMax(short[] audioBuffer) {
-		short max = audioBuffer[0];
+		short max = (short)Math.abs(audioBuffer[0]);
 		for (int i = 1; i < audioBuffer.length; i++){
-			if (audioBuffer[i] > max){
+			if (Math.abs(audioBuffer[i]) > max){
 				max = audioBuffer[i];
 			}
 		}
@@ -65,8 +72,6 @@ public class MainHandler implements VoiceHandler{
 		short [] buffer = {1,2,3,4,5,6,7,8,9,10};
 
 //        buffer = Preprocessing.handle(buffer);
-
-        //TODO add preprocessing
 
 		double [][] audioFrames = divToFrames(normalize(buffer));
         double result [] = Mel.getMelKrepsCoef(audioFrames);

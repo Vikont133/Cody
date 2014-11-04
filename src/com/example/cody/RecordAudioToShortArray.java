@@ -18,6 +18,7 @@ public class RecordAudioToShortArray {
 	private static final String AUDIO_RECORDER_TEMP_FILE = "record_temp.raw";
 	private static final int RECORDER_SAMPLERATE = 16000;
 	private String ONLYNAME;
+    private String NAME;
 	private AudioRecord recorder = null;
 	private int bufferSize = 0;
 	private Thread recordingThread = null;
@@ -42,7 +43,8 @@ public class RecordAudioToShortArray {
 		}
 		ONLYNAME = "/" + System.currentTimeMillis()
 				+ AUDIO_RECORDER_FILE_EXT_WAV;
-		return (file.getAbsolutePath() + ONLYNAME);
+        NAME = file.getAbsolutePath() + ONLYNAME;
+		return NAME;
 	}
 
 	private String getTempFilename() {
@@ -178,7 +180,7 @@ public class RecordAudioToShortArray {
 	}
 
 	private byte[] readBytesFromFile() throws IOException {
-		File file = new File(getFilename());
+		File file = new File(NAME);
 		InputStream is = new FileInputStream(file);
 		long length = file.length();
 		byte[] bytes = new byte[(int) length];
