@@ -55,9 +55,11 @@ public class MainActivity extends Activity {
 				enableButtons(false);
 				try {
 					record.stopRecording();
-                    LineGraph lineGraph = new LineGraph();
-                    Intent lineIntent = lineGraph.execute(me, MainHandler.getMelKreps(record.arrayShort));
-                    startActivity(lineIntent);
+                    MainHandler.checkVoice(record.arrayShort);
+//                    MainHandler.main(null);
+//                    LineGraph lineGraph = new LineGraph();
+//                    Intent lineIntent = lineGraph.execute(me, MainHandler.getMelKreps(record.arrayShort));
+//                    startActivity(lineIntent);
 //                    double[] mel = MainHandler.getMelKreps(record.arrayShort);
 //                    for (int i = 0; i < mel.length; i++) {
 //                        System.out.println(mel[i] + " ");

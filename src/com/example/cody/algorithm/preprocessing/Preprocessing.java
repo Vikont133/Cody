@@ -2,8 +2,6 @@ package com.example.cody.algorithm.preprocessing;
 
 public class Preprocessing {
 
-
-    public static
     public static double[] handle(double [] x){
         return deleteSteadyComponent(x);
     }

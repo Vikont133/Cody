@@ -14,7 +14,7 @@ import android.os.Environment;
 public class RecordAudioToShortArray {
 	private static final int RECORDER_BPP = 16;
 	private static final String AUDIO_RECORDER_FILE_EXT_WAV = ".wav";
-	private static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
+	private static final String AUDIO_RECORDER_FOLDER = "Cody/records";
 	private static final String AUDIO_RECORDER_TEMP_FILE = "record_temp.raw";
 	private static final int RECORDER_SAMPLERATE = 16000;
 	private String ONLYNAME;

@@ -1,43 +1,121 @@
 package com.example.cody.algorithm;
 
 
-import com.example.cody.VoiceHandler;
+import android.os.Environment;
+import com.example.cody.AppLog;
 import com.example.cody.algorithm.preprocessing.Preprocessing;
 import com.example.cody.algorithm.processing.Mel;
 
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-public class MainHandler implements VoiceHandler{
+public class MainHandler{
 
 	public static final int FRAME_LENGTH = 2048;
     public static final int SAMPLING_FREQ = 16000;
-	
-	@Override
-	public void addUser(String name, short[] audioBuffer) {
+    public static final String USER_DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/Cody/users";
 
+	public static void addUser(String name, short[] audioBuffer) {
+        double[] mels = getMelKreps(audioBuffer);
+        save(name, mels);
+	}
+	public static void removeUser(String name) {
+        try {
+            remove(name);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void checkVoice(short[] audioBuffer) {
+        double[] mels = getMelKreps(audioBuffer);
+        check(mels);
 	}
 
-	@Override
-	public void removeUser(String name) {
-		// TODO Auto-generated method stub
-		
-	}
+    private static void check(double[] mels) {
+        File dir = new File(USER_DIRECTORY);
 
-	@Override
-	public void checkVoice(short[] audioBuffer) {
-		// TODO Auto-generated method stub
-		
-	}
+        if(!dir.isDirectory()){
+            AppLog.logString("No user data directory");
+            return;
+        }
+        if (dir.listFiles().length == 0){
+            AppLog.logString("No added users");
+            return;
+        }
+        for(File file : dir.listFiles()){
+            double distance = getDistance(readMels(file), mels);
+            System.out.println(file.getName() + distance);
+        }
+    }
 
-    public static double[] getMelKreps(short[] audioBuffer){
+    private static double getDistance(double[] mels1, double[] mels2) {
+        double distance = 0;
+        for (int i = 0; i < mels1.length; i++) {
+            distance += Math.abs(mels1[i] - mels2[i]);
+        }
+        return distance;
+    }
+
+    private static double[] readMels(File file) {
+        try {
+            DataInputStream stream = new DataInputStream( new FileInputStream(file));
+            List<Double> mels = new ArrayList<Double>();
+            while(stream.available() > 0)
+            {
+                double c = stream.readDouble();
+                mels.add(c);
+            }
+            double[] array = new double[mels.size()];
+            for(int i = 0; i < mels.size(); i++) {
+                array[i] = mels.get(i);
+            }
+            return array;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static void remove(String name) throws IllegalAccessException {
+        File file = new File(USER_DIRECTORY, name);
+        if (!file.exists()){
+            throw new IllegalAccessException("User doesn't exist");
+        }
+        file.delete();
+    }
+
+    private static void save(String name, double[] mels) {
+        File file = new File(USER_DIRECTORY);
+
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+
+        try {
+            String path = USER_DIRECTORY + "/" + name;
+            DataOutputStream myfile = new DataOutputStream( new FileOutputStream(path));
+            for(double x : mels){
+                myfile.writeDouble(x);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static double[] getMelKreps(short[] audioBuffer){
         double [] tmp = Preprocessing.handle(normalize(audioBuffer));
-
         double [][] audioFrames = divToFrames(tmp);
         return Mel.getMelKrepsCoef(audioFrames);
     }
 	
 	private static double[] normalize(short[] audioBuffer) {
 		short max = findMax(audioBuffer);
+        AppLog.logString("Max size = " + max);
 		double[] newBuffer = new double[audioBuffer.length];
 		for(int i = 0; i < audioBuffer.length; i++){
 			newBuffer[i] = (double)audioBuffer[i] / max;
@@ -66,15 +144,16 @@ public class MainHandler implements VoiceHandler{
 		}
 		return frames;
 	}
-	
-	
+
 	public static void main(String[] args) {
-		short [] buffer = {1,2,3,4,5,6,7,8,9,10};
+        File dir = new File(USER_DIRECTORY);
 
-//        buffer = Preprocessing.handle(buffer);
-
-		double [][] audioFrames = divToFrames(normalize(buffer));
-        double result [] = Mel.getMelKrepsCoef(audioFrames);
-        System.out.println(result);
+        for(File file : dir.listFiles()){
+            double[] mels = readMels(file);
+            for (double x : mels){
+                System.out.print(x + " ");
+            }
+            System.out.println();
+        }
     }
 }
