@@ -6,23 +6,21 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.cody.MainActivity" >
+    tools:context="com.example.cody.MainActivity">
 
     <Button
-        android:id="@+id/recordbutton"
+        android:id="@+id/addlayoutbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="66dp"
-        android:text="Start Record" />
+        android:text="ADD" />
 
     <Button
-        android:id="@+id/stopbutton"
+        android:id="@+id/checkloyaoutbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignTop="@+id/recordbutton"
-        android:text="Stop Record" />
+        android:text="CHECK" android:layout_alignTop="@+id/addlayoutbutton" android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>

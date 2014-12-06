@@ -29,26 +29,32 @@ public class MainHandler{
         }
     }
 
-    public static void checkVoice(short[] audioBuffer) {
+    public static String checkVoice(short[] audioBuffer) {
         double[] mels = getMelKreps(audioBuffer);
-        check(mels);
+        return check(mels);
 	}
 
-    private static void check(double[] mels) {
+    private static String check(double[] mels) {
         File dir = new File(USER_DIRECTORY);
 
         if(!dir.isDirectory()){
             AppLog.logString("No user data directory");
-            return;
+            return null;
         }
         if (dir.listFiles().length == 0){
             AppLog.logString("No added users");
-            return;
+            return null;
         }
+        String name = null;
+        double distance = 99999;
         for(File file : dir.listFiles()){
-            double distance = getDistance(readMels(file), mels);
-            System.out.println(file.getName() + distance);
+            double tmp = getDistance(readMels(file), mels);
+            if (tmp < distance){
+                distance = tmp;
+                name = file.getName();
+            }
         }
+        return name;
     }
 
     private static double getDistance(double[] mels1, double[] mels2) {

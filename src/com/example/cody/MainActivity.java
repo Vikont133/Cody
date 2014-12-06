@@ -1,12 +1,13 @@
 package com.example.cody;
 
 import android.content.Context;
-import android.content.Intent;
-import android.widget.Button;
+
 import java.io.IOException;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 import com.example.cody.algorithm.MainHandler;
 
 
@@ -20,56 +21,86 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		setButtonHandlers();
-		enableButtons(false);
         me = this;
-
-		record = new RecordAudioToShortArray();
 	}
 
 	private void setButtonHandlers() {
-		((Button) findViewById(R.id.recordbutton)).setOnClickListener(btnClick);
-		((Button) findViewById(R.id.stopbutton)).setOnClickListener(btnClick);
-	}
-
-	private void enableButton(int id, boolean isEnable) {
-		((Button) findViewById(id)).setEnabled(isEnable);
-	}
-
-	private void enableButtons(boolean isRecording) {
-		enableButton(R.id.recordbutton, !isRecording);
-		enableButton(R.id.stopbutton, isRecording);
+		findViewById(R.id.addlayoutbutton).setOnClickListener(btnClick);
+		findViewById(R.id.checkloyaoutbutton).setOnClickListener(btnClick);
 	}
 
 	private View.OnClickListener btnClick = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			switch (v.getId()) {
-			case R.id.recordbutton: {
-				AppLog.logString("Start Recording");
-				enableButtons(true);
-				record.startRecording();
-				break;
-			}
-			case R.id.stopbutton: {
-				AppLog.logString("Stop Recording");
-				enableButtons(false);
-				try {
-					record.stopRecording();
-                    MainHandler.checkVoice(record.arrayShort);
-//                    MainHandler.main(null);
-//                    LineGraph lineGraph = new LineGraph();
-//                    Intent lineIntent = lineGraph.execute(me, MainHandler.getMelKreps(record.arrayShort));
-//                    startActivity(lineIntent);
-//                    double[] mel = MainHandler.getMelKreps(record.arrayShort);
-//                    for (int i = 0; i < mel.length; i++) {
-//                        System.out.println(mel[i] + " ");
-//                    }
-                } catch (IOException e) {
-					e.printStackTrace();
-				}
-				break;
-			}
-			}
+                case R.id.addlayoutbutton: {
+                    setContentView(R.layout.add_user);
+                    findViewById(R.id.startbutton).setOnClickListener(addViewListener);
+                    findViewById(R.id.stopbutton).setOnClickListener(addViewListener);
+                    break;
+                }
+                case R.id.checkloyaoutbutton: {
+                    setContentView(R.layout.check_user);
+                    findViewById(R.id.startbutton1).setOnClickListener(checkViewListener);
+                    findViewById(R.id.stopbutton1).setOnClickListener(checkViewListener);
+                    findViewById(R.id.backbutton).setOnClickListener(checkViewListener);
+                    break;
+                }
+            }
 		}
 	};
+
+    private View.OnClickListener addViewListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.startbutton: {
+                    record = new RecordAudioToShortArray();
+                    record.startRecording();
+                    break;
+                }
+                case R.id.stopbutton: {
+                    try {
+                        record.stopRecording();
+                        String name = ((EditText) findViewById(R.id.editText)).getText().toString();
+                        MainHandler.addUser(name, record.arrayShort);
+
+                        setContentView(R.layout.activity_main);
+                        findViewById(R.id.addlayoutbutton).setOnClickListener(btnClick);
+                        findViewById(R.id.checkloyaoutbutton).setOnClickListener(btnClick);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    };
+
+    private View.OnClickListener checkViewListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.startbutton1: {
+                    record = new RecordAudioToShortArray();
+                    record.startRecording();
+                    break;
+                }
+                case R.id.backbutton: {
+                    setContentView(R.layout.activity_main);
+                    findViewById(R.id.addlayoutbutton).setOnClickListener(btnClick);
+                    findViewById(R.id.checkloyaoutbutton).setOnClickListener(btnClick);
+                    break;
+                }
+                case R.id.stopbutton1: {
+                    try {
+                        record.stopRecording();
+                        String name = MainHandler.checkVoice(record.arrayShort);
+                        ((TextView) findViewById(R.id.textView)).setText(name);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    };
 }
