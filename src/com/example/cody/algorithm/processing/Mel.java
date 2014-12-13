@@ -5,7 +5,7 @@ import com.example.cody.algorithm.MainHandler;
 
 public class Mel {
 	
-	private static int NUMBER_OF_FILTERS = 20;
+	public static int NUMBER_OF_FILTERS = 20;
 	private static double LOW_FREQ = 0;
 	private static double HIGH_FREQ = 8000;
     private static double[] f_smp = filterBank();
@@ -32,8 +32,11 @@ public class Mel {
         for (double[] arr : x){
             double[] tmp = getMelKrepsCoef(arr);
             for (int i = 0; i < tmp.length; i++) {
-                result[i] += tmp[i] / NUMBER_OF_FILTERS;
+                result[i] += tmp[i];
             }
+        }
+        for (int i = 0; i < result.length; i++){
+            result[i] = result[i] / x.length;
         }
         return result;
     }
