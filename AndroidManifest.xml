@@ -7,8 +7,9 @@
     <uses-sdk
         android:minSdkVersion="19"
         android:targetSdkVersion="19" />
+
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/> 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
@@ -26,6 +27,26 @@
             </intent-filter>
         </activity>
         <activity android:name="org.achartengine.GraphicalActivity" />
+        <activity
+            android:name=".StartLockScreen"
+            >
+        </activity>
+
+        <service android:name=".MyService" >
+        </service>
+
+        <receiver
+            android:name="receiver.lockScreenReeiver"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
+
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
 </manifest>
