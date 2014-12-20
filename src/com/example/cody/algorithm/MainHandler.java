@@ -38,7 +38,12 @@ public class MainHandler{
     }
 
     public static String checkVoice(short[] audioBuffer) {
-        double[] mels = getMelKreps(audioBuffer);
+        double[] mels = new double[0];
+        try {
+            mels = getMelKreps(audioBuffer);
+        } catch (IOException e) {
+            return null;
+        }
         return check(mels);
 	}
 
@@ -174,13 +179,13 @@ public class MainHandler{
         }
     }
 
-    public static double[] getMelKreps(short[] audioBuffer){
+    public static double[] getMelKreps(short[] audioBuffer) throws IOException {
         double [] tmp = Preprocessing.handle(normalize(audioBuffer));
         double [][] audioFrames = divToFrames(tmp);
         return Mel.getMelKrepsCoef(audioFrames);
     }
 	
-	private static double[] normalize(short[] audioBuffer) {
+	private static double[] normalize(short[] audioBuffer) throws IOException {
 		short max = findMax(audioBuffer);
 		double[] newBuffer = new double[audioBuffer.length];
 		for(int i = 0; i < audioBuffer.length; i++){
@@ -189,7 +194,9 @@ public class MainHandler{
 		return newBuffer;
 	}
 	
-	private static short findMax(short[] audioBuffer) {
+	private static short findMax(short[] audioBuffer) throws IOException {
+        if(audioBuffer.length < 1)
+            throw new IOException("Empty buffer");
 		short max = (short)Math.abs(audioBuffer[0]);
 		for (int i = 1; i < audioBuffer.length; i++){
 			if (Math.abs(audioBuffer[i]) > max){
