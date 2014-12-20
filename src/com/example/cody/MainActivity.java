@@ -5,8 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.WallpaperManager;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.sax.TextElementListener;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -18,26 +24,28 @@ import com.example.cody.algorithm.MainHandler;
 public class MainActivity extends Activity {
 	private RecordAudioToShortArray record = null;
 
+    private boolean isRecordingFragment = false;
+
+    private ListView mainListView;
+
+    private ArrayAdapter<String> mainMenuAdapter;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		getWindow().addFlags(
-				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-						| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-						| WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		setButtonHandlers();
-		
+
+        initMainLayout();
+
 		try {
-			// инициализация рисивера
+            // There are was unreadable comment
 			startService(new Intent(this, MyService.class));
-			// стартуем отслеживание состояния телефона
+            // There are was unreadable comment
 			StateListener phoneStateListener = new StateListener();
 			phoneStateListener.setButtonHandlers1();
 			phoneStateListener.enableButtons1(true);
-			// узнаем все сервисы которые есть
+            // There are was unreadable comment
 			TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-			// слушаем когда телефон уходит в сон и включаем нашего блокировщика
+            // There are was unreadable comment
 			telephonyManager.listen(phoneStateListener,
 					PhoneStateListener.LISTEN_CALL_STATE);
 		} catch (Exception e) {
@@ -45,35 +53,47 @@ public class MainActivity extends Activity {
 		}
 
 	}
-	
+
 	class StateListener extends PhoneStateListener {
 
 		private View.OnClickListener btnClick1 = new View.OnClickListener() {
 			public void onClick(View v) {
-				switch (v.getId()) {
-				case R.id.unlock: {
-					AppLog.logString("Unlock");
-					finish();
-				}
-					break;
-				}
 			}
 		};
-		
+
 		private void setButtonHandlers1() {
-			((Button) findViewById(R.id.unlock)).setOnClickListener(btnClick1);
+
 		}
 
 		private void enableButtons1(boolean isRecording) {
-			enableButton(R.id.unlock, isRecording);
+
 		}
 	}
 
 	private void setButtonHandlers() {
-		findViewById(R.id.addlayoutbutton).setOnClickListener(btnClick);
-		findViewById(R.id.checkloyaoutbutton).setOnClickListener(btnClick);
+		mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                switch(position) {
+                    case 0: { // Add user
+                        initialAddLayout();
+                        break;
+                    }
+
+                    case 1: { // User list
+                        initUserListLayout();
+                        break;
+                    }
+                }
+
+            }
+        });
 	}
-	
+
+    @Override
+    public void onBackPressed() {
+        initMainLayout();
+    }
 	private void enableButton(int id, boolean isEnable) {
 		((Button) findViewById(id)).setEnabled(isEnable);
 	}
@@ -82,12 +102,12 @@ public class MainActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			switch (v.getId()) {
-                case R.id.addlayoutbutton: {
+                case 1: {
                     setContentView(R.layout.add_user);
                     initialAddLayout();
                     break;
                 }
-                case R.id.checkloyaoutbutton: {
+                case 2: {
                     setContentView(R.layout.check_user);
                     initialCheckLayout();
                     break;
@@ -97,66 +117,131 @@ public class MainActivity extends Activity {
 	};
 
     private void initialCheckLayout(){
-        findViewById(R.id.startbutton).setOnClickListener(checkViewListener);
+        /*findViewById(R.id.startbutton).setOnClickListener(checkViewListener);
         findViewById(R.id.startbutton).setEnabled(true);
         findViewById(R.id.stopbutton).setOnClickListener(checkViewListener);
         findViewById(R.id.stopbutton).setEnabled(false);
         findViewById(R.id.backbutton).setOnClickListener(checkViewListener);
-        findViewById(R.id.backbutton).setEnabled(true);
+        findViewById(R.id.backbutton).setEnabled(true);*/
+    }
+
+    private void initMainLayout() {
+        setContentView(R.layout.activity_main);
+        mainListView = (ListView) findViewById(R.id.main_list_view);
+        mainMenuAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1,
+                getResources().getStringArray(R.array.main_menu_items));
+        mainListView.setAdapter(mainMenuAdapter);
+
+        setButtonHandlers();
     }
 
     private void initialAddLayout(){
+        setContentView(R.layout.add_user);
         findViewById(R.id.startbutton).setOnClickListener(addViewListener);
-        findViewById(R.id.startbutton).setEnabled(false);
-        findViewById(R.id.stopbutton).setOnClickListener(addViewListener);
-        findViewById(R.id.stopbutton).setEnabled(false);
-        findViewById(R.id.confirmbutton).setOnClickListener(addViewListener);
-        findViewById(R.id.confirmbutton).setEnabled(true);
+        findViewById(R.id.newUserName).setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                ((EditText) v).setText("");
+            }
+        });
+    }
+
+    private void initUserListLayout() {
+        setContentView(R.layout.user_list_layout);
+        final ListView userListView = (ListView) findViewById(R.id.user_list);
+        ArrayAdapter<String> userAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1,
+                MainHandler.getUserList());
+        userListView.setAdapter(userAdapter);
+
+        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final String userToDelete = userListView.getItemAtPosition(position).toString();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setMessage(R.string.are_you_sure_to_delete_user)
+                        .setTitle(R.string.delete_user);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        MainHandler.removeUser(userToDelete);
+                        initUserListLayout();
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
     private View.OnClickListener addViewListener = new View.OnClickListener() {
+        private int n = 0;
+        private List<double[]> arr = new ArrayList<double[]>();
 
         @Override
         public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.startbutton: {
-                    findViewById(R.id.startbutton).setEnabled(false);
-                    record = new RecordAudioToShortArray();
-                    record.startRecording();
-                    findViewById(R.id.stopbutton).setEnabled(true);
-                    break;
-                }
-                case R.id.stopbutton: {
-                    try {
-                        findViewById(R.id.stopbutton).setEnabled(false);
-                        record.stopRecording();
-                        arr.add(MainHandler.getMelKreps(record.arrayShort));
-                        click(++n);
-                        if (n == 10) {
-                            setContentView(R.layout.activity_main);
-                            setButtonHandlers();
-                            MainHandler.addUser(name, arr);
-                            arr = new ArrayList<double[]>();n = 0;
-                            return;
-                        }
-                        findViewById(R.id.startbutton).setEnabled(true);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            EditText usernameEdit = (EditText) findViewById(R.id.newUserName);
+            String username = usernameEdit.getText().toString();
+            if(username.length() < 1) {
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        getResources().getText(R.string.user_already_exist), Toast.LENGTH_SHORT);
+                toast.show();
+                return;
+            }
+            if(MainHandler.isUserExist(username)) {
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        getResources().getText(R.string.user_already_exist), Toast.LENGTH_SHORT);
+                toast.show();
+                return;
+            }
+
+            usernameEdit.setEnabled(false);
+
+            if (!isRecordingFragment) {
+                record = new RecordAudioToShortArray();
+                record.startRecording();
+                isRecordingFragment = true;
+                ((Button) findViewById(R.id.startbutton)).setText(R.string.stop_record);
+            } else {
+                try {
+                    record.stopRecording();
+                    arr.add(MainHandler.getMelKreps(record.arrayShort));
+                    click(++n);
+                    ((Button) findViewById(R.id.startbutton)).setText(R.string.start_record);
+                    if (n == 10) {
+                        initMainLayout();
+
+                        Toast toast = Toast.makeText(getApplicationContext(),
+                                getResources().getText(R.string.user_added), Toast.LENGTH_SHORT);
+                        toast.show();
+
+                        MainHandler.addUser(username,
+                                arr);
+                        arr = new ArrayList<double[]>();
+
+                        n = 0;
+
+                        return;
                     }
-                }
-                case R.id.confirmbutton: {
-                    name = ((EditText) findViewById(R.id.editText)).getText().toString();
-                    findViewById(R.id.stopbutton).setEnabled(false);
-                    findViewById(R.id.startbutton).setEnabled(true);
-                    findViewById(R.id.confirmbutton).setEnabled(false);
-                    findViewById(R.id.editText).setEnabled(false);
+
+                    isRecordingFragment = false;
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
-
-        private int n = 0;
-        private List<double[]> arr = new ArrayList<double[]>();
-        private String name;
     };
 
     private void click(int n){
@@ -177,7 +262,7 @@ public class MainActivity extends Activity {
     private View.OnClickListener checkViewListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            switch (v.getId()) {
+            /*switch (v.getId()) {
                 case R.id.startbutton: {
                     record = new RecordAudioToShortArray();
                     record.startRecording();
@@ -201,7 +286,7 @@ public class MainActivity extends Activity {
                         e.printStackTrace();
                     }
                 }
-            }
+            }*/
         }
     };
 }

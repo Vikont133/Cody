@@ -42,6 +42,16 @@ public class MainHandler{
         return check(mels);
 	}
 
+    public static boolean isUserExist(String name) {
+        File file = new File(USER_DIRECTORY, name);
+        return file.exists();
+    }
+
+    public static String[] getUserList() {
+        File file = new File(USER_DIRECTORY);
+        return file.list();
+    }
+
     private static List<Double[]> cluster (List<double[]> list){
         KMeans kmeans = new KMeans(CLUSTER_NUMBER, ITERATION_NUMBER);
         Dataset dataset = new DefaultDataset();
@@ -99,7 +109,7 @@ public class MainHandler{
             AppLog.logString("WTF?");
         }
         if (distance > MAX_DISTANCE) {
-            name = "UNKNOWN";
+            return null;
         }
         return name;
     }
